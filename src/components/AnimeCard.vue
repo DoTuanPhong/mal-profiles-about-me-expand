@@ -53,23 +53,26 @@
           </div>
         </div>
 
-        <!-- Cấp độ 3: Spoilers - ĐÃ SỬA -->
-        <div v-if="hasVisibleComments(highlight)" class="text-right space-y-1 pr-4">
+        <!-- Cấp độ 3: Spoilers - ĐÃ TỐI ƯU -->
+        <div v-if="hasCommentsWithSpoilers(highlight)" class="text-right space-y-2 pr-2">
           <div
             v-for="(moment, mIndex) in highlight.moments"
             :key="mIndex"
-            class="flex justify-end items-start space-x-2 space-x-reverse"
+            v-if="moment.comment"
+            class="flex justify-end items-start space-x-2"
           >
-            <!-- Spoiler content -->
-            <div class="flex-1 text-right">
+            <!-- Spoiler content mới - nhỏ gọn và đẹp hơn -->
+            <div class="flex flex-col items-end space-y-1 max-w-full">
+              <!-- Nút spoiler nhỏ gọn -->
               <button
                 @click="toggleSpoiler(hIndex, mIndex)"
                 :class="[
-                  'inline-flex items-center justify-end px-3 py-1 rounded-full text-xs font-medium transition-all mr-2',
+                  'inline-flex items-center justify-center px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border',
                   isSpoilerVisible(hIndex, mIndex) 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800' 
-                    : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900 dark:text-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800' 
+                    : 'bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
                 ]"
+                :title="isSpoilerVisible(hIndex, mIndex) ? 'Ẩn spoiler' : 'Hiện spoiler'"
               >
                 <svg v-if="!isSpoilerVisible(hIndex, mIndex)" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -77,15 +80,24 @@
                 <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {{ isSpoilerVisible(hIndex, mIndex) ? 'Hide spoiler' : 'Show spoiler' }}
+                {{ isSpoilerVisible(hIndex, mIndex) ? 'Ẩn' : 'Hiện' }}
               </button>
-              <!-- Spoiler text -->
-              <p
-                v-if="moment.comment && isSpoilerVisible(hIndex, mIndex)"
-                class="inline-block bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-300 text-sm italic px-3 py-2 rounded-lg shadow-sm border border-blue-200 dark:border-gray-600 text-right"
+              
+              <!-- Spoiler text với hiệu ứng mượt mà -->
+              <transition
+                enter-active-class="transition-all duration-200 ease-out"
+                leave-active-class="transition-all duration-150 ease-in"
+                enter-from-class="opacity-0 transform -translate-y-2"
+                leave-to-class="opacity-0 transform -translate-y-2"
               >
-                {{ moment.timestamp }}: {{ moment.comment }}
-              </p>
+                <div
+                  v-if="moment.comment && isSpoilerVisible(hIndex, mIndex)"
+                  class="bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-sm px-3 py-2 rounded-lg border border-blue-200 dark:border-gray-600 shadow-sm max-w-full text-right"
+                >
+                  <div class="font-medium text-blue-800 dark:text-blue-200 mb-1">{{ moment.timestamp }}</div>
+                  <div class="italic">{{ moment.comment }}</div>
+                </div>
+              </transition>
             </div>
           </div>
         </div>
@@ -95,7 +107,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps({
   anime: {
@@ -104,46 +116,24 @@ const props = defineProps({
   }
 });
 
-// Sửa state management
 const showSpoilers = ref({});
 
-// Helper function để kiểm tra spoiler visibility
 const isSpoilerVisible = (hIndex, mIndex) => {
   return !!(showSpoilers.value[hIndex] && showSpoilers.value[hIndex][mIndex]);
 };
 
-// Function để toggle spoiler - ĐÃ SỬA
 const toggleSpoiler = (hIndex, mIndex) => {
-  // Đảm bảo highlight index tồn tại
   if (!showSpoilers.value[hIndex]) {
     showSpoilers.value[hIndex] = {};
   }
-  
-  // Toggle trạng thái
   showSpoilers.value[hIndex][mIndex] = !showSpoilers.value[hIndex][mIndex];
-  
-  // Force reactivity nếu cần
   showSpoilers.value = {...showSpoilers.value};
 };
 
-// Helper để check nếu highlight có comments VÀ có ít nhất một comment đang hiển thị hoặc có thể hiển thị
-const hasVisibleComments = (highlight) => {
-  return highlight.moments && 
-         highlight.moments.some(m => m.comment);
+// Chỉ hiển thị spoiler section nếu có ít nhất một moment có comment
+const hasCommentsWithSpoilers = (highlight) => {
+  return highlight.moments && highlight.moments.some(m => m.comment);
 };
-
-// Debug: log data để kiểm tra
-console.log('Anime data:', props.anime);
-if (props.anime.highlights) {
-  props.anime.highlights.forEach((highlight, hIndex) => {
-    console.log(`Highlight ${hIndex}:`, highlight);
-    if (highlight.moments) {
-      highlight.moments.forEach((moment, mIndex) => {
-        console.log(`  Moment ${mIndex}:`, moment);
-      });
-    }
-  });
-}
 </script>
 
 <style scoped>
@@ -169,5 +159,28 @@ if (props.anime.highlights) {
 .highlight-item:last-child {
   border-bottom: none;
   padding-bottom: 0;
+}
+
+/* Tùy chỉnh scrollbar cho spoiler text nếu content dài */
+.spoiler-content {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.spoiler-content::-webkit-scrollbar {
+  width: 4px;
+}
+.spoiler-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+.spoiler-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+.dark .spoiler-content::-webkit-scrollbar-track {
+  background: #374151;
+}
+.dark .spoiler-content::-webkit-scrollbar-thumb {
+  background: #6b7280;
 }
 </style>
