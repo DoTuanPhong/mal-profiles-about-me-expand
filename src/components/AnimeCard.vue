@@ -103,3 +103,62 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue';
+
+const props = defineProps({
+  anime: {
+    type: Object,
+    required: true
+  }
+});
+
+// Reactive state cho spoilers (per highlight per moment)
+const showSpoilers = ref({});
+
+// Function để toggle spoiler
+const toggleSpoiler = (hIndex, mIndex) => {
+  if (!showSpoilers.value[hIndex]) {
+    showSpoilers.value[hIndex] = {};
+  }
+  showSpoilers.value[hIndex][mIndex] = !showSpoilers.value[hIndex][mIndex];
+};
+
+// Helper để check nếu highlight có comments
+const hasComments = (highlight) => {
+  return highlight.moments.some(m => m.comment);
+};
+
+// Hàm helper để làm sáng màu cho gradient
+function lightenColor(hex) {
+  if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) return 'rgb(150, 150, 150)';
+  
+  let r = parseInt(hex.slice(1, 3), 16);
+  let g = parseInt(hex.slice(3, 5), 16);
+  let b = parseInt(hex.slice(5, 7), 16);
+  
+  return `rgb(${Math.min(255, r + 40)}, ${Math.min(255, g + 40)}, ${Math.min(255, b + 40)})`;
+}
+</script>
+
+<style scoped>
+.anime-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.anime-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+.header {
+  /* Đảm bảo text-center hoạt động */
+}
+.highlight-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 1.5rem;
+}
+.highlight-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+</style>
