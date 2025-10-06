@@ -1,13 +1,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+// Thêm 'orderBy' và 'query' từ firebase/firestore
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
 
 const animeList = ref([]);
 const isLoading = ref(true);
 
 onMounted(async () => {
-  const q = query(collection(db, "anime"), orderBy("title"));
+  // Tạo một câu truy vấn có sắp xếp
+  const q = query(collection(db, "anime"), orderBy("createdAt", "desc")); // "desc" = descending = giảm dần
+
+  // Thực thi câu truy vấn
   const querySnapshot = await getDocs(q);
   animeList.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   isLoading.value = false;
