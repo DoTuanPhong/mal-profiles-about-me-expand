@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import AnimeCard from './components/AnimeCard.vue'; // Giả sử AnimeCard nằm ở đường dẫn này
+import AnimeCard from './AnimeCard.vue'; // Giả sử AnimeCard nằm ở đường dẫn này
 
 // Dữ liệu gốc
 const animeListRaw = ref([]);
