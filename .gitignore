@@ -44,3 +44,7 @@ coverage
 /pnpm-error.*
 
 .env.local
+
+# Firebase service account key
+serviceAccountKey.json
+data.json
