@@ -42,3 +42,5 @@ coverage
 /yarn-error.*
 /pnpm-debug.*
 /pnpm-error.*
+
+.env.local
