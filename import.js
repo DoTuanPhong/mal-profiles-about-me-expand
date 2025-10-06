@@ -1,7 +1,7 @@
 // import.js
 
 // 1. Khởi tạo Firebase Admin
-const admin = require("firebase-admin");
+const admin = import("firebase-admin");
 // Đọc file key bạn vừa tải về
 const serviceAccount = require("./mal-profiles-about-me-expand-firebase-adminsdk-fbsvc-0379de740a.json");
 
