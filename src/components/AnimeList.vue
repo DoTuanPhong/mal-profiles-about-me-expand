@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import AnimeCard from './components/AnimeCard.vue'; // Giả sử AnimeCard đã tồn tại
+import AnimeCard from './AnimeCard.vue'; // Giả sử AnimeCard đã tồn tại
 // ⚠️ Cần import các hàm FIREBASE cần thiết
 import { collection, getDocs, query } from 'firebase/firestore'; 
 // KHÔNG CẦN 'orderBy' nếu ta muốn sắp xếp trên client.
