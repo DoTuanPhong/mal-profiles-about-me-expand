@@ -3,7 +3,7 @@
 // 1. Khởi tạo Firebase Admin
 const admin = import("firebase-admin");
 // Đọc file key bạn vừa tải về
-const serviceAccount = require("./mal-profiles-about-me-expand-firebase-adminsdk-fbsvc-0379de740a.json");
+const serviceAccount = import("./mal-profiles-about-me-expand-firebase-adminsdk-fbsvc-0379de740a.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
