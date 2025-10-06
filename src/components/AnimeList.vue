@@ -1,117 +1,104 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import AnimeCard from './AnimeCard.vue'; // Giả sử AnimeCard đã tồn tại
-// ⚠️ Cần import các hàm FIREBASE cần thiết
-import { collection, getDocs, query } from 'firebase/firestore'; 
-// KHÔNG CẦN 'orderBy' nếu ta muốn sắp xếp trên client.
-import { db } from '../firebase'; // Giả sử db được export từ './firebase'
+import AnimeCard from './AnimeCard.vue';
+// ✅ SỬA: Import 'db' trực tiếp từ file cấu hình firebase
+import { db } from '../firebase'; // Giả sử file của bạn là 'src/firebase.js'
+import { collection, getDocs } from 'firebase/firestore';
 
-// --- STATE ---
-const animeListRaw = ref([]); // Dữ liệu gốc từ Firestore
-const sortOption = ref('newest'); // 'newest', 'az', 'za'
-const isLoading = ref(true);
+const animeListRaw = ref([]);
+const sortOption = ref('newest');
+// ✅ CẢI TIẾN: Thêm biến trạng thái loading
+const isLoading = ref(true); 
+const errorMsg = ref('');
 
-// --- LẤY DỮ LIỆU TỪ FIRESTORE ---
-onMounted(async () => {
+const fetchData = async () => {
+  isLoading.value = true;
+  errorMsg.value = '';
   try {
-    // Lấy dữ liệu KHÔNG CẦN orderBy (hoặc chỉ orderBy cơ bản nếu cần index)
-    // Query đơn giản để lấy tất cả tài liệu
-    const q = query(collection(db, "animes")); 
+    // ✅ SỬA: Đúng tên collection là 'anime'
+    const animeCollectionRef = collection(db, 'anime');
+    const snapshot = await getDocs(animeCollectionRef);
 
-    const querySnapshot = await getDocs(q);
-    
-    animeListRaw.value = querySnapshot.docs.map(doc => {
+    const fetchedAnimeList = snapshot.docs.map(doc => {
       const data = doc.data();
-      return { 
-        id: doc.id, 
+      return {
+        id: doc.id,
         ...data,
-        // Chuyển đổi Firestore Timestamp thành Date object để dễ sắp xếp
-        // Thêm kiểm tra nếu trường createdAt không tồn tại
-        createdAt: data.createdAt ? data.createdAt.toDate() : new Date(0), 
+        createdAt: data.createdAt?.toDate() || new Date(0), // Dùng optional chaining cho an toàn
       };
     });
 
+    animeListRaw.value = fetchedAnimeList;
+    console.log("Dữ liệu anime đã được tải thành công.");
   } catch (error) {
     console.error("Lỗi khi tải dữ liệu từ Firestore:", error);
+    errorMsg.value = "Không thể tải danh sách anime. Vui lòng thử lại sau.";
   } finally {
+    // Luôn đặt isLoading = false sau khi hoàn tất
     isLoading.value = false;
   }
-});
+};
 
-// --- LOGIC SẮP XẾP BẰNG COMPUTED ---
-/**
- * Computed property để sắp xếp danh sách anime
- * Sẽ tự động chạy lại khi animeListRaw hoặc sortOption thay đổi
- */
+onMounted(fetchData);
+
 const sortedAnimeList = computed(() => {
-  if (!animeListRaw.value.length) return [];
-  
-  const list = [...animeListRaw.value]; // Tạo bản sao để sắp xếp
-  
+  // Logic sắp xếp của bạn đã rất tốt, không cần thay đổi
+  const list = [...animeListRaw.value];
   if (sortOption.value === 'az') {
-    // Sắp xếp theo tên A-Z
     return list.sort((a, b) => a.title.localeCompare(b.title));
   }
-  
   if (sortOption.value === 'za') {
-    // Sắp xếp theo tên Z-A
     return list.sort((a, b) => b.title.localeCompare(a.title));
   }
-  
-  // Mặc định là 'newest' (Mới nhất)
-  // Sắp xếp giảm dần (mới nhất lên đầu)
   return list.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 });
 </script>
 
 <template>
   <div class="anime-list-container">
-    
-    <div class="p-4 flex justify-end">
-      <select v-model="sortOption" class="p-2 border rounded shadow-md bg-white">
+    <div class="p-4 flex justify-end sticky top-0 bg-gray-100/80 backdrop-blur-sm z-10">
+      <select v-model="sortOption" class="p-2 border rounded-md shadow-sm bg-white focus:ring-2 focus:ring-blue-500">
         <option value="newest">Mới nhất</option>
         <option value="az">Tên A-Z</option>
         <option value="za">Tên Z-A</option>
       </select>
     </div>
     
-    <div v-if="isLoading" class="text-center p-8 text-xl text-gray-600">
+    <!-- ✅ CẢI TIẾN: Quản lý trạng thái loading và lỗi tốt hơn -->
+    <div v-if="isLoading" class="text-center p-10 text-gray-500">
       Đang tải dữ liệu...
     </div>
-
-    <div v-else class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-      
+    <div v-else-if="errorMsg" class="text-center p-10 text-red-500">
+      {{ errorMsg }}
+    </div>
+    <div v-else-if="sortedAnimeList.length" class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
       <AnimeCard
         v-for="(anime, index) in sortedAnimeList"
         :key="anime.id" 
         :anime="anime"
-        :class="['fade-in', `delay-${index * 100}ms`]"
+        class="fade-in"
+        :style="{ 'animation-delay': `${index * 50}ms` }" 
       />
-      
-      <p v-if="!sortedAnimeList.length" class="col-span-full text-center text-gray-500">
-        Không tìm thấy anime nào.
-      </p>
+    </div>
+    <div v-else class="text-center p-10 text-gray-500">
+      Chưa có anime nào trong danh sách.
     </div>
   </div>
 </template>
 
 <style scoped>
+/* Style của bạn đã tốt, chỉ cần sửa một chút animation delay */
 .anime-list-container {
-  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+  background-color: #f8f9fa;
   min-height: 100vh;
 }
 .fade-in {
   opacity: 0;
-  animation: fadeIn 0.6s ease-in-out forwards;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-.delay-0ms { animation-delay: 0ms; }
-.delay-100ms { animation-delay: 100ms; }
-.delay-200ms { animation-delay: 200ms; }
-/* ... Thêm các lớp delay khác ... */
 </style>
