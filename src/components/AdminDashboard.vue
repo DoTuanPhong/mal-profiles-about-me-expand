@@ -18,6 +18,7 @@ const sortOption = ref('newest');
 /**
  * Hàm lấy dữ liệu từ Firestore
  */
+ 
 const fetchData = async () => {
   try {
     // 1. Tạo reference đến collection 'animes'
