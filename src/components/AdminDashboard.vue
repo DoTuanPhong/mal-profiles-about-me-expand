@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import AnimeCard from './components/AnimeCard.vue';
+import AnimeCard from './AnimeCard.vue';
 // ⚠️ CẦN IMPORT CÁC THƯ VIỆN FIREBASE CẦN THIẾT
 // Ví dụ (thay đổi tùy theo cách bạn cấu hình):
 import { getFirestore, collection, getDocs } from 'firebase/firestore'; 
