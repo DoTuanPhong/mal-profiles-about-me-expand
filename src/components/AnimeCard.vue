@@ -3,8 +3,8 @@
     class="anime-card bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-xl overflow-hidden border-l-4 max-w-2xl mx-auto transition-all duration-300" 
     :style="{'--anime-color': anime.color || '#cccccc'}"
   >
-    <!-- Header -->
-    <div class="header p-6 text-center relative overflow-hidden">
+    <!-- Header - Căn giữa -->
+    <div class="header px-8 py-6 text-center relative overflow-hidden">
       <div class="absolute inset-0 bg-black/20"></div>
       <a :href="anime.url" target="_blank" class="block relative z-10 transition-colors hover:text-white/100">
         <h2 class="text-3xl font-bold text-white mb-4 shadow-sm" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">
@@ -13,8 +13,8 @@
       </a>
     </div>
     
-    <!-- Highlights -->
-    <div class="highlights p-6 space-y-4">
+    <!-- Highlights - Thụt lề -->
+    <div class="highlights py-6 px-8 space-y-4">
       <div
         v-for="(highlight, hIndex) in anime.highlights"
         :key="hIndex"
@@ -54,15 +54,15 @@
         </div>
 
         <!-- Cấp độ 3: Spoilers - CHỈ ẨN KHI KHÔNG CÓ COMMENT -->
-        <div v-if="hasCommentsWithSpoilers(highlight)" class="text-right space-y-2 pr-2">
+        <div v-if="hasCommentsWithSpoilers(highlight)" class="text-center space-y-2">
           <div
             v-for="(moment, mIndex) in getMomentsWithComments(highlight)"
             :key="mIndex"
-            class="flex justify-end items-start space-x-2"
+            class="flex justify-center items-start"
           >
             <!-- Spoiler content -->
-            <div class="flex flex-col items-end space-y-1 max-w-full">
-              <!-- Nút spoiler mới với gradient -->
+            <div class="flex flex-col items-center space-y-1 max-w-full">
+              <!-- Nút spoiler mới với kaomoji -->
               <button
                 @click="toggleSpoiler(hIndex, mIndex)"
                 :class="[
@@ -72,14 +72,8 @@
                     : 'spoiler-btn-show'
                 ]"
               >
-                <span class="flex items-center">
-                  <svg v-if="!isSpoilerVisible(hIndex, mIndex)" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 5 10" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                  </svg>
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 10 10" fill="currentColor">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                  {{ isSpoilerVisible(hIndex, mIndex) ? 'Hide Spoiler' : 'Show Spoiler' }}
+                <span>
+                  {{ isSpoilerVisible(hIndex, mIndex) ? '(¬‿¬) Hide Spoiler' : '(⊙_⊙)？ Show Spoiler' }}
                 </span>
               </button>
               
@@ -92,7 +86,7 @@
               >
                 <div
                   v-if="isSpoilerVisible(hIndex, mIndex)"
-                  class="spoiler-content bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-sm px-4 py-3 rounded-lg border border-blue-200 dark:border-gray-600 shadow-sm max-w-full text-right mt-2"
+                  class="spoiler-content bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-sm px-4 py-3 rounded-lg border border-blue-200 dark:border-gray-600 shadow-sm max-w-full text-center mt-2"
                 >
                   <div class="font-medium text-blue-800 dark:text-blue-200 mb-1">{{ moment.timestamp }}</div>
                   <div class="italic leading-relaxed">{{ moment.comment }}</div>
@@ -167,7 +161,7 @@ const getMomentsWithComments = (highlight) => {
   padding-bottom: 0;
 }
 
-/* Nút spoiler mới với gradient */
+/* Nút spoiler mới với gradient và kaomoji */
 .spoiler-btn-show {
   background: linear-gradient(135deg, #ec4899, #f97316);
   color: white;
