@@ -49,7 +49,7 @@
             </span>
           </div>
           <div v-else class="text-gray-500 dark:text-gray-400 italic text-sm">
-            Không có khoảnh khắc nổi bật.
+            No highlighted moments.
           </div>
         </div>
 
@@ -62,39 +62,40 @@
           >
             <!-- Spoiler content -->
             <div class="flex flex-col items-end space-y-1 max-w-full">
-              <!-- Nút spoiler nhỏ gọn -->
+              <!-- Nút spoiler mới với gradient -->
               <button
                 @click="toggleSpoiler(hIndex, mIndex)"
                 :class="[
-                  'inline-flex items-center justify-center px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 border',
+                  'spoiler-btn inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2',
                   isSpoilerVisible(hIndex, mIndex) 
-                    ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900 dark:text-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800' 
-                    : 'bg-gray-100 text-gray-600 border-gray-300 dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    ? 'spoiler-btn-hide' 
+                    : 'spoiler-btn-show'
                 ]"
-                :title="isSpoilerVisible(hIndex, mIndex) ? 'Ẩn spoiler' : 'Hiện spoiler'"
               >
-                <svg v-if="!isSpoilerVisible(hIndex, mIndex)" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {{ isSpoilerVisible(hIndex, mIndex) ? 'Ẩn' : 'Hiện' }}
+                <span class="flex items-center">
+                  <svg v-if="!isSpoilerVisible(hIndex, mIndex)" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  {{ isSpoilerVisible(hIndex, mIndex) ? 'Hide Spoiler' : 'Show Spoiler' }}
+                </span>
               </button>
               
               <!-- Spoiler text với hiệu ứng mượt mà -->
               <transition
-                enter-active-class="transition-all duration-200 ease-out"
-                leave-active-class="transition-all duration-150 ease-in"
+                enter-active-class="transition-all duration-300 ease-out"
+                leave-active-class="transition-all duration-200 ease-in"
                 enter-from-class="opacity-0 transform -translate-y-2"
                 leave-to-class="opacity-0 transform -translate-y-2"
               >
                 <div
                   v-if="isSpoilerVisible(hIndex, mIndex)"
-                  class="bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-sm px-3 py-2 rounded-lg border border-blue-200 dark:border-gray-600 shadow-sm max-w-full text-right"
+                  class="spoiler-content bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-sm px-4 py-3 rounded-lg border border-blue-200 dark:border-gray-600 shadow-sm max-w-full text-right mt-2"
                 >
                   <div class="font-medium text-blue-800 dark:text-blue-200 mb-1">{{ moment.timestamp }}</div>
-                  <div class="italic">{{ moment.comment }}</div>
+                  <div class="italic leading-relaxed">{{ moment.comment }}</div>
                 </div>
               </transition>
             </div>
@@ -164,6 +165,37 @@ const getMomentsWithComments = (highlight) => {
 .highlight-item:last-child {
   border-bottom: none;
   padding-bottom: 0;
+}
+
+/* Nút spoiler mới với gradient */
+.spoiler-btn-show {
+  background: linear-gradient(135deg, #ec4899, #f97316);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.3), 0 2px 4px -1px rgba(236, 72, 153, 0.2);
+  border: none;
+}
+
+.spoiler-btn-show:hover {
+  box-shadow: 0 6px 8px -1px rgba(236, 72, 153, 0.4), 0 4px 6px -1px rgba(236, 72, 153, 0.3);
+}
+
+.spoiler-btn-hide {
+  background: transparent;
+  color: #f97316;
+  border: 2px solid;
+  border-image: linear-gradient(135deg, #ec4899, #f97316) 1;
+  box-shadow: 0 2px 4px -1px rgba(249, 115, 22, 0.2);
+}
+
+.spoiler-btn-hide:hover {
+  box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.3);
+}
+
+/* Focus styles */
+.spoiler-btn:focus {
+  ring: 2px;
+  ring-color: rgba(249, 115, 22, 0.5);
+  ring-offset: 2px;
 }
 
 /* Tùy chỉnh scrollbar cho spoiler text nếu content dài */
