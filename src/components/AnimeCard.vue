@@ -20,7 +20,7 @@
         :key="hIndex"
         class="highlight-item space-y-2"
       >
-        <!-- Cấp độ 2 -->
+        <!-- Cấp độ 2 - LUÔN HIỂN THỊ -->
         <div class="text-center space-y-1">
           <div class="flex items-center justify-center space-x-2">
             <a
@@ -53,15 +53,14 @@
           </div>
         </div>
 
-        <!-- Cấp độ 3: Spoilers - ĐÃ TỐI ƯU -->
+        <!-- Cấp độ 3: Spoilers - CHỈ ẨN KHI KHÔNG CÓ COMMENT -->
         <div v-if="hasCommentsWithSpoilers(highlight)" class="text-right space-y-2 pr-2">
           <div
-            v-for="(moment, mIndex) in highlight.moments"
+            v-for="(moment, mIndex) in getMomentsWithComments(highlight)"
             :key="mIndex"
-            v-if="moment.comment"
             class="flex justify-end items-start space-x-2"
           >
-            <!-- Spoiler content mới - nhỏ gọn và đẹp hơn -->
+            <!-- Spoiler content -->
             <div class="flex flex-col items-end space-y-1 max-w-full">
               <!-- Nút spoiler nhỏ gọn -->
               <button
@@ -91,7 +90,7 @@
                 leave-to-class="opacity-0 transform -translate-y-2"
               >
                 <div
-                  v-if="moment.comment && isSpoilerVisible(hIndex, mIndex)"
+                  v-if="isSpoilerVisible(hIndex, mIndex)"
                   class="bg-blue-50 dark:bg-gray-700 text-blue-700 dark:text-blue-300 text-sm px-3 py-2 rounded-lg border border-blue-200 dark:border-gray-600 shadow-sm max-w-full text-right"
                 >
                   <div class="font-medium text-blue-800 dark:text-blue-200 mb-1">{{ moment.timestamp }}</div>
@@ -132,7 +131,13 @@ const toggleSpoiler = (hIndex, mIndex) => {
 
 // Chỉ hiển thị spoiler section nếu có ít nhất một moment có comment
 const hasCommentsWithSpoilers = (highlight) => {
-  return highlight.moments && highlight.moments.some(m => m.comment);
+  return highlight.moments && highlight.moments.some(m => m.comment && m.comment.trim() !== '');
+};
+
+// Lọc chỉ những moments có comment để hiển thị nút spoiler
+const getMomentsWithComments = (highlight) => {
+  if (!highlight.moments) return [];
+  return highlight.moments.filter(m => m.comment && m.comment.trim() !== '');
 };
 </script>
 
