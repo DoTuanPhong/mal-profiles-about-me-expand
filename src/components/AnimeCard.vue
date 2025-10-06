@@ -1,11 +1,14 @@
 <template>
   <div class="anime-card bg-white rounded-xl shadow-lg overflow-hidden border-l-4 max-w-2xl mx-auto" :style="{ borderLeftColor: anime.color || '#cccccc' }">
-    <!-- Header: Tên tác phẩm cấp độ 1, căn giữa, font lớn, ngoặc góc -->
+    <!-- Header: Tên tác phẩm cấp độ 1, căn giữa, font lớn, ngoặc góc, clickable toàn bộ -->
     <div class="header p-6 text-center relative overflow-hidden" :style="{ background: `linear-gradient(135deg, ${anime.color || '#4A5568'}, ${lightenColor(anime.color || '#4A5568')})` }">
       <div class="absolute inset-0 bg-black/10"></div>
-      <h2 class="text-3xl font-bold text-white mb-4 relative z-10 shadow-sm">
-        「{{ anime.title }}」
-      </h2>
+      <a :href="anime.url" target="_blank" class="block relative z-10 transition-colors hover:text-white/100">
+        <h2 class="text-3xl font-bold text-white mb-4 shadow-sm">
+          「{{ anime.title }}」
+        </h2>
+      </a>
+      <!-- Link MAL giữ nguyên dưới tiêu đề, nhưng có thể tích hợp nếu cần -->
       <a :href="anime.url" target="_blank" class="text-white/90 hover:text-white/100 hover:underline text-sm relative z-10 transition-colors">
         Xem trên MyAnimeList →
       </a>
@@ -18,23 +21,21 @@
         :key="hIndex"
         class="highlight-item space-y-2"
       >
-        <!-- Cấp độ 2: Dòng episode/movie với timestamps, căn giữa -->
+        <!-- Cấp độ 2: Dòng episode/movie với timestamps, căn giữa, episode clickable -->
         <div class="text-center space-y-1">
-          <!-- Episode hoặc Movie title -->
+          <!-- Episode hoặc Movie title, clickable toàn bộ -->
           <div class="flex items-center justify-center space-x-2">
-            <span v-if="highlight.type === 'episode'" class="text-blue-500 font-semibold text-lg">
-              episode {{ highlight.number }}
-            </span>
-            <span v-else class="text-blue-500 font-semibold text-lg">
-              {{ highlight.title || 'Movie' }}
-            </span>
-            <!-- Play link nếu có -->
-            <a v-if="highlight.url" :href="highlight.url" @click.stop target="_blank" class="text-blue-500 hover:text-blue-700 transition-colors ml-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <a
+              v-if="highlight.url"
+              :href="highlight.url"
+              target="_blank"
+              class="text-blue-500 font-semibold text-lg hover:text-blue-700 transition-colors"
+            >
+              {{ highlight.type === 'episode' ? `episode ${highlight.number}` : 'Movie' }}
             </a>
+            <span v-else class="text-blue-500 font-semibold text-lg">
+              {{ highlight.type === 'episode' ? `episode ${highlight.number}` : 'Movie' }}
+            </span>
           </div>
 
           <!-- Timestamps với ～ và ⁘, nếu có moments -->
